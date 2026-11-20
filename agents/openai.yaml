@@ -1,0 +1,4 @@
+interface:
+  display_name: "larouter-stt"
+  short_description: "Transcribe audio through LaRouter"
+  default_prompt: "Use $larouter-stt for speech-to-text transcripts and subtitles through LaRouter."
