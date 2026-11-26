@@ -37,7 +37,8 @@ echo "local=${LOCAL:-none} remote=${REMOTE:-unreachable}"
 
 - Base URL: `https://i-larouter.lapage.vn/v1`
 - Transcription: `POST /v1/audio/transcriptions` (multipart form, like OpenAI Whisper)
-- Model: `larouter-stt` (`GET /v1/models/stt`). Price: $0.006 per minute of audio.
+- Model: `larouter-stt` (`GET /v1/models/stt`).
+- Cost: Transcription is billed in LaRouter credits and draws from the same weekly limit as chat. The user can see their limit and usage on the portal's Hạn mức page (https://larouter.lapage.vn/vi/portal/usage). Never quote a price or cost in USD or any other currency; point the user to that page instead.
 
 Authentication: use `$LAROUTER_API_KEY` when it is set. If it is unset, read the `experimental_bearer_token` value from `~/.codex/config.toml` (Codex), then the `ANTHROPIC_AUTH_TOKEN` that LaRouter's Claude Code setup puts in the environment and `~/.claude/settings.json` (only when the base URL is `i-larouter.lapage.vn`), and use it only in the request. Never print or store the key in prompts, logs, files or generated artifacts. If there is no key, ask the user for their LaRouter API key (from https://i-larouter.lapage.vn).
 
