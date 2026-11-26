@@ -3,7 +3,7 @@ name: larouter-stt
 description: Transcribe speech in audio or video files to text, subtitles (srt, vtt) or timed segments through LaRouter's OpenAI-compatible speech-to-text endpoint. Use whenever the user wants a transcript, meeting or call notes, subtitles or captions, the words of a voice message, a podcast or a video, or to check what a generated voiceover actually says, in Vietnamese, English or about 90 other languages.
 metadata:
   short-description: Speech-to-text through LaRouter
-  version: 1.0.0
+  version: 1.1.0
 ---
 
 # LaRouter Speech-to-Text
@@ -39,11 +39,20 @@ echo "local=${LOCAL:-none} remote=${REMOTE:-unreachable}"
 - Transcription: `POST /v1/audio/transcriptions` (multipart form, like OpenAI Whisper)
 - Model: `larouter-stt` (`GET /v1/models/stt`). Price: $0.006 per minute of audio.
 
-Authentication: use `$LAROUTER_API_KEY` when it is set. If it is unset, read the `experimental_bearer_token` value from `~/.codex/config.toml` and use it only in the request. Never print or store the key in prompts, logs, files or generated artifacts. If there is no key, ask the user for their LaRouter API key (from https://i-larouter.lapage.vn).
+Authentication: use `$LAROUTER_API_KEY` when it is set. If it is unset, read the `experimental_bearer_token` value from `~/.codex/config.toml` (Codex), then the `ANTHROPIC_AUTH_TOKEN` that LaRouter's Claude Code setup puts in the environment and `~/.claude/settings.json` (only when the base URL is `i-larouter.lapage.vn`), and use it only in the request. Never print or store the key in prompts, logs, files or generated artifacts. If there is no key, ask the user for their LaRouter API key (from https://i-larouter.lapage.vn).
 
 ```sh
 if [ -z "${LAROUTER_API_KEY:-}" ] && [ -f "$HOME/.codex/config.toml" ]; then
   LAROUTER_API_KEY="$(sed -n 's/^experimental_bearer_token = "\([^"]*\)"/\1/p' "$HOME/.codex/config.toml" | head -1)"
+fi
+# Claude Code set up with LaRouter keeps the key as ANTHROPIC_AUTH_TOKEN.
+if [ -z "${LAROUTER_API_KEY:-}" ]; then
+  case "${ANTHROPIC_BASE_URL:-}" in
+    *i-larouter.lapage.vn*) LAROUTER_API_KEY="${ANTHROPIC_AUTH_TOKEN:-}" ;;
+  esac
+fi
+if [ -z "${LAROUTER_API_KEY:-}" ] && grep -qs 'i-larouter\.lapage\.vn' "$HOME/.claude/settings.json"; then
+  LAROUTER_API_KEY="$(sed -n 's/.*"ANTHROPIC_AUTH_TOKEN"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$HOME/.claude/settings.json" | head -1)"
 fi
 ```
 
